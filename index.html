@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autos DARM • Dashboard Concesionario</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="theme-default">
+  <script>
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user) {
+    window.location.href = 'login.html';
+  }
+</script>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" role="navigation" aria-label="Menú lateral">
+      <div class="brand">
+        <div class="brand__logo">AD</div>
+        <button id="sidebarToggle" class="sidebar__toggle" aria-expanded="true" aria-controls="sidebarMenu">☰
+          <span class="sr-only">Mostrar/ocultar menú</span>
+        </button>
+        <h1 class="brand__title">Autos <span>DARM</span></h1>
+      </div>
+
+      <nav id="sidebarMenu" class="menu" aria-label="Secciones del dashboard">
+        <ul>
+          <li><a href="#inicio" class="is-active">Inicio</a></li>
+          <li><a href="#inventario">Inventario</a></li>
+          <li><a href="#ventas">Ventas</a></li>
+          <li><a href="#clientes">Clientes</a></li>
+          <li><a href="#galeria">Galería</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#citas">Citas</a></li>
+          <li><a href="#reportes">Reportes</a></li>
+          <li><a href="#alta">Alta vehículo</a></li>
+          <li><a href="#ajustes">Ajustes</a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar__footer">
+        <button class="btn btn--secondary" id="themeSwitch" aria-pressed="false" title="Cambiar tema">🎨 Tema</button>
+      </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="topbar" role="banner">
+      <form class="search" role="search" aria-label="Buscar">
+        <label class="sr-only" for="q">Buscar</label>
+        <input id="q" name="q" type="search" placeholder="Buscar autos, clientes, ventas…" />
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+      <div class="topbar__actions">
+        <button class="icon-btn" aria-label="Notificaciones" title="Notificaciones">🔔</button>
+        <button class="icon-btn" aria-label="Ayuda" title="Ayuda">❓</button>
+        <div class="user">
+          <img src="https://via.placeholder.com/32" alt="Avatar de usuario" />
+          <span aria-hidden="true">asesor@autosdarm</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="content" role="main">
+      <!-- INICIO -->
+       <!-- USUARIOS -->
+<section id="usuarios" class="panel">
+  <div class="panel__header">
+    <h2 class="section-title">Gestión de usuarios</h2>
+    <div class="panel__actions">
+      <button id="btnCargarUsuarios" class="btn">Cargar usuarios</button>
+    </div>
+  </div>
+
+  <form id="userForm" class="form" style="margin-bottom:16px">
+    <input type="hidden" id="userId" />
+    <label for="nombre">Nombre</label><input id="nombre" required />
+    <label for="email">Correo</label><input id="email" type="email" required />
+    <label for="rol">Rol</label>
+    <select id="rol"><option>Asesor</option><option>Gerente</option><option>Empleado</option></select>
+    <button class="btn" type="submit">Guardar usuario</button>
+    <p id="userMsg" aria-live="polite"></p>
+  </form>
+
+  <div class="table-wrapper">
+    <table class="data-table" id="usersTable">
+      <thead>
+        <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+      <section id="inicio" class="panel chart-panel">
+        <h2 class="section-title">Resumen del día</h2>
+        <div class="cards">
+          <article class="card kpi" tabindex="0"><h3 class="card__title">Ventas</h3><p class="kpi__value">$ 520.000.000</p><p class="kpi__trend kpi__trend--up">+21%</p></article>
+          <article class="card kpi" tabindex="0"><h3 class="card__title">Test drives</h3><p class="kpi__value">31</p><p class="kpi__trend">7 hoy</p></article>
+          <article class="card kpi" tabindex="0"><h3 class="card__title">Stock</h3><p class="kpi__value">102</p><p class="kpi__trend kpi__trend--warn">15 bajos</p></article>
+          <article class="card kpi" tabindex="0"><h3 class="card__title">Leads</h3><p class="kpi__value">44</p><p class="kpi__trend kpi__trend--up">+9%</p></article>
+        </div>
+        <div class="chart-canvas" role="img" aria-label="Gráfico de líneas de ventas diarias">
+          <div class="chart-controls">
+            <button id="loadJson" class="btn">Cargar JSON</button>
+            <label for="csvInput" class="btn btn--secondary" tabindex="0">Importar CSV
+              <input id="csvInput" type="file" accept=".csv" style="display:none">
+            </label>
+          </div>
+          <canvas id="salesChart" aria-describedby="salesChartDesc"></canvas>
+          <p class="sr-only" id="salesChartDesc">Ventas diarias recientes; puedes cargar datos JSON o CSV.</p>
+        </div>
+      </section>
+
+      <!-- INVENTARIO -->
+      <section id="inventario" class="panel">
+        <div class="panel__header">
+          <h2 class="section-title">Inventario de vehículos</h2>
+          <div class="panel__actions">
+            <button class="btn" id="exportCsv">Exportar</button>
+            <a class="btn btn--secondary" href="#alta">Agregar vehículo</a>
+          </div>
+        </div>
+        <div class="table-wrapper" role="region" aria-labelledby="inventario" tabindex="0">
+          <table id="inventoryTable" class="data-table">
+            <caption class="sr-only">Listado de vehículos con estado y precio</caption>
+            <thead><tr><th>ID</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Precio</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>V-2042</td><td>Toyota</td><td>Corolla</td><td>2024</td><td>$ 95.000.000</td><td><span class="badge badge--ok">Disponible</span></td></tr>
+              <tr><td>V-2088</td><td>Kia</td><td>Sportage</td><td>2023</td><td>$ 138.000.000</td><td><span class="badge badge--warn">Reservado</span></td></tr>
+              <tr><td>V-2101</td><td>Chevrolet</td><td>Onix</td><td>2022</td><td>$ 68.000.000</td><td><span class="badge badge--error">Vendido</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VENTAS (barras CSS) -->
+      <section id="ventas" class="panel">
+        <h2 class="section-title">Ventas del mes</h2>
+        <div class="bar-chart" role="img" aria-label="Gráfico de barras de ventas por semana">
+          <div class="bar" style="--h: 45%" aria-label="Semana 1: 45%"></div>
+          <div class="bar" style="--h: 70%" aria-label="Semana 2: 70%"></div>
+          <div class="bar" style="--h: 60%" aria-label="Semana 3: 60%"></div>
+          <div class="bar" style="--h: 88%" aria-label="Semana 4: 88%"></div>
+        </div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section id="clientes" class="panel">
+        <h2 class="section-title">Clientes recientes</h2>
+        <ul class="list">
+          <li><strong>Laura Díaz</strong> • Interesada en Mazda 3 • <a href="#citas" class="link">Agendar prueba</a></li>
+          <li><strong>Carlos Álvarez</strong> • Cotizó Renault Duster • <a href="#ventas" class="link">Ver cotización</a></li>
+          <li><strong>Paula Méndez</strong> • Interesada en Kia Rio • <a href="#citas" class="link">Agendar prueba</a></li>
+        </ul>
+      </section>
+
+      <!-- GALERÍA DE AUTOS -->
+      <section id="galeria" class="panel">
+        <div class="panel__header">
+          <h2 class="section-title">Galería de modelos</h2>
+          <div class="panel__actions"><a class="btn" href="#inventario">Ver inventario</a></div>
+        </div>
+        <div class="gallery" role="region" aria-label="Imágenes de autos">
+          <figure>
+            <img src="Mercedes-AMG-GT-Coupe-2024-Lateral-1024x614.jpg" alt="Coupé rojo deportivo estacionado" />
+            <figcaption>Coupe GT <span class="tag">Nuevo</span></figcaption>
+          </figure>
+          <figure>
+            <img src="OIP.webp" alt="Sedán negro visto de frente" />
+            <figcaption>Sedán  <span class="tag">Top</span></figcaption>
+          </figure>
+          <figure>
+            <img src="OIP (1).webp" alt="Interior premium de vehículo" />
+            <figcaption>Interior Premium</figcaption>
+          </figure>
+          <figure>
+            <img src="OIP (2).webp" alt="SUV blanco en carretera" />
+            <figcaption>SUV <span class="tag">Demo</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- NOSOTROS -->
+      <section id="nosotros" class="panel about">
+        <div class="about__text">
+          <h2 class="section-title">Sobre Autos DARM</h2>
+          <p><span class="about__badge">15+ años</span> conectando personas con el auto ideal.</p>
+          <p>En <strong>Autos DARM</strong> combinamos tecnología, transparencia y servicio humano para ofrecer una experiencia de compra ágil y confiable. Nuestro inventario está curado por expertos y cada vehículo pasa por una inspección de 120 puntos.</p>
+          <p>Con presencia en las principales ciudades y un equipo certificado, te acompañamos desde la prueba de manejo hasta la matrícula.</p>
+        </div>
+        <div>
+          <div class="gallery" aria-label="Instalaciones y equipo">
+            <figure>
+              <img src="R.jpeg" alt="Sala de exhibición moderna" />
+              <figcaption>Showroom principal</figcaption>
+            </figure>
+            <figure>
+              <img src="98f660986a543a3977637edee2987989.jpg" alt="Técnico realizando mantenimiento" />
+              <figcaption>Taller certificado</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- CITAS -->
+      <section id="citas" class="panel">
+        <h2 class="section-title">Citas de test drive</h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Cliente</th><th>Vehículo</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr><td>Laura Díaz</td><td>Mazda 3</td><td>2025-08-20 10:00</td><td><span class="badge badge--warn">Pendiente</span></td><td><button class="btn btn--secondary">Confirmar</button></td></tr>
+              <tr><td>Juan Pérez</td><td>Toyota Yaris</td><td>2025-08-18 15:00</td><td><span class="badge badge--ok">Confirmada</span></td><td><button class="btn">Detalles</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REPORTES -->
+      <section id="reportes" class="panel">
+        <h2 class="section-title">Reportes</h2>
+        <p>Descarga reportes de inventario, ventas y citas en formatos CSV o PDF.</p>
+        <div class="panel__actions">
+          <button class="btn">Inventario CSV</button>
+          <button class="btn">Ventas PDF</button>
+          <button class="btn btn--secondary">Citas CSV</button>
+        </div>
+      </section>
+
+      <!-- ALTA -->
+      <section id="alta" class="panel">
+        <h2 class="section-title">Alta de vehículo</h2>
+        <form class="form" id="vehicleForm" novalidate>
+          <label for="idv">ID</label><input id="idv" name="idv" required placeholder="V-1234" />
+          <label for="marca">Marca</label><input id="marca" name="marca" required />
+          <label for="modelo">Modelo</label><input id="modelo" name="modelo" required />
+          <label for="anio">Año</label><input id="anio" name="anio" type="number" min="1990" max="2030" required />
+          <label for="precio">Precio (COP)</label><input id="precio" name="precio" type="number" min="0" step="100000" required />
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" required>
+            <option value="Disponible">Disponible</option>
+            <option value="Reservado">Reservado</option>
+            <option value="Vendido">Vendido</option>
+          </select>
+          <button class="btn" type="submit">Agregar a inventario</button>
+          <p id="formMsg" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <!-- AJUSTES -->
+      <section id="ajustes" class="panel">
+        <h2 class="section-title">Ajustes</h2>
+        <form class="form">
+          <label for="moneda">Moneda</label>
+          <select id="moneda"><option>COP</option><option>USD</option><option>EUR</option></select>
+          <label for="notis">Notificaciones</label>
+          <input id="notis" type="checkbox" checked />
+          <button class="btn">Guardar</button>
+        </form>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <p>© 2025 Autos DARM • NIT 900.123.456-7 • Carrera 45 #12-34, Bogotá • Tel: (601) 555-0199</p>
+      <p><a href="#" rel="noopener">Política de privacidad</a> · <a href="#" rel="noopener">Términos</a> · <a href="#inicio" class="link">Volver arriba</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Sidebar toggle
+    const toggle = document.getElementById('sidebarToggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const sb = document.querySelector('.sidebar');
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      sb.classList.toggle('is-collapsed');
+    });
+  }
+
+  // Theme
+  const themeBtn = document.getElementById('themeSwitch');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', (e) => {
+      const pressed = e.currentTarget.getAttribute('aria-pressed') === 'true';
+      e.currentTarget.setAttribute('aria-pressed', String(!pressed));
+      document.body.classList.toggle('theme-alt');
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') document.body.classList.add('using-keyboard');
+  });
+
+  // ===== Chart.js con JSON y CSV =====
+  let salesChart;
+  const canvas = document.getElementById('salesChart');
+  const ctx = canvas ? canvas.getContext('2d') : null;
+  const initChart = (labels, data) => {
+    if (!ctx) return;
+    if (salesChart) salesChart.destroy();
+    salesChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label:'Ventas (millones COP)', data, tension:.35, borderWidth:2, fill:true }] },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ labels:{ color:getComputedStyle(document.body).getPropertyValue('--text') }}},
+        scales:{
+          x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:'rgba(255,255,255,.1)'}},
+          y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:'rgba(255,255,255,.1)'}}
+        }
+      }
+    });
+  };
+
+  const loadJsonBtn = document.getElementById('loadJson');
+  if (loadJsonBtn) {
+    loadJsonBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('data/sales.json');
+        if (!res.ok) throw new Error('No se pudo obtener data/sales.json');
+        const json = await res.json();
+        initChart(json.labels, json.values);
+      } catch {
+        alert('No se pudo cargar data/sales.json');
+      }
+    });
+  }
+
+  const csvInput = document.getElementById('csvInput');
+  if (csvInput) {
+    csvInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if(!file) return;
+      const text = await file.text();
+      const labels=[], values=[];
+      text.split(/\r?\n/).forEach(line=>{ const [l,v]=line.split(','); if(l && !isNaN(parseFloat(v))){labels.push(l.trim()); values.push(parseFloat(v));}});
+      if(labels.length) initChart(labels, values);
+    });
+  }
+
+  // Estado inicial
+  initChart(Array.from({length:7},(_,i)=>'Día '+(i+1)), [12,9,14,11,16,19,21]);
+
+  // ===== Gestión de Usuarios =====
+  // después
+  const API_URL = "http://localhost:3002/users";
+  const tableBody = document.querySelector("#usersTable tbody");
+  const userForm = document.getElementById("userForm");
+  const msgUser = document.getElementById("userMsg");
+  const btnCargar = document.getElementById("btnCargarUsuarios");
+
+  async function cargarUsuarios() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error('Error al cargar usuarios');
+      const data = await res.json();
+      if (tableBody) {
+        tableBody.innerHTML = "";
+        data.forEach(u => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${u.id}</td>
+            <td>${u.nombre}</td>
+            <td>${u.email}</td>
+            <td>${u.rol}</td>
+            <td>
+              <button class="btn btn--secondary" onclick="editarUsuario(${u.id})">Editar</button>
+              <button class="btn" style="background:#ef4444" onclick="eliminarUsuario(${u.id})">Eliminar</button>
+            </td>`;
+          tableBody.appendChild(tr);
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      if (msgUser) { msgUser.textContent = '❌ No se pudieron cargar usuarios'; msgUser.style.color = '#f87171'; }
+    }
+  }
+
+  if (btnCargar) btnCargar.addEventListener("click", cargarUsuarios);
+
+  // Crear / actualizar
+  if (userForm) {
+    userForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = userForm.userId.value;
+      const usuario = {
+        nombre: userForm.nombre.value,
+        email: userForm.email.value,
+        rol: userForm.rol.value
+      };
+      try {
+        let res;
+        if (id) {
+          res = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(usuario)
+          });
+        } else {
+          res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(usuario)
+          });
+        }
+        if (!res.ok) throw new Error("Error al guardar");
+        if (msgUser) { msgUser.textContent = "✅ Usuario guardado correctamente"; msgUser.style.color = "#34d399"; }
+        userForm.reset();
+        if (userForm.userId) userForm.userId.value = "";
+        cargarUsuarios();
+      } catch (err) {
+        if (msgUser) { msgUser.textContent = "❌ " + err.message; msgUser.style.color = "#f87171"; }
+      }
+    });
+  }
+
+  // Editar
+  window.editarUsuario = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/${id}`);
+      if (!res.ok) throw new Error('Usuario no encontrado');
+      const u = await res.json();
+      if (userForm) {
+        userForm.userId.value = u.id;
+        userForm.nombre.value = u.nombre;
+        userForm.email.value = u.email;
+        userForm.rol.value = u.rol;
+      }
+      if (msgUser) { msgUser.textContent = "✏️ Editando usuario " + u.id; msgUser.style.color = "#fbbf24"; }
+    } catch (err) {
+      console.error(err);
+      if (msgUser) { msgUser.textContent = "❌ " + err.message; msgUser.style.color = "#f87171"; }
+    }
+  };
+
+  // Eliminar
+  window.eliminarUsuario = async (id) => {
+    if (!confirm("¿Eliminar usuario?")) return;
+    try {
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error('Error al eliminar');
+      cargarUsuarios();
+    } catch (err) {
+      console.error(err);
+      if (msgUser) { msgUser.textContent = "❌ " + err.message; msgUser.style.color = "#f87171"; }
+    }
+  };
+
+  // Cargar al inicio
+  cargarUsuarios();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autos DARM • Iniciar Sesión</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display:flex; justify-content:center; align-items:center;
+      height:100vh; background:#f1f5f9; font-family:sans-serif;
+    }
+    .box {
+      background:white; padding:2rem; border-radius:1rem;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1); width:320px;
+    }
+    h1 { text-align:center; margin-bottom:1rem; }
+    input,button {
+      width:100%; padding:.75rem; margin-top:.5rem;
+      border-radius:.5rem; border:1px solid #ccc;
+    }
+    button {
+      background:#2563eb; color:white; font-weight:bold; cursor:pointer;
+    }
+    button:hover { background:#1d4ed8; }
+    .msg { text-align:center; margin-top:1rem; }
+    a { display:block; text-align:center; margin-top:1rem; color:#2563eb; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Autos DARM</h1>
+    <form id="loginForm">
+      <label>Correo</label>
+      <input type="email" id="email" required placeholder="asesor@autosdarm.com">
+      <label>Contraseña</label>
+      <input type="password" id="password" required placeholder="••••••••">
+      <button type="submit">Ingresar</button>
+      <p class="msg" id="loginMsg"></p>
+    </form>
+    <a href="register.html">¿No tienes cuenta? Regístrate</a>
+  </div>
+
+  <script>
+    // después
+const API_URL = "http://localhost:3002/users";
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('loginMsg');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = form.email.value;
+      const password = form.password.value;
+
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("Error al conectar con el servidor");
+        const users = await res.json();
+
+        const user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          window.location.href = 'index.html';
+        } else {
+          msg.textContent = '❌ Credenciales incorrectas';
+          msg.style.color = '#ef4444';
+        }
+      } catch (err) {
+        msg.textContent = '❌ ' + err.message;
+        msg.style.color = '#ef4444';
+      }
+    });
+  </script>
+</body>
+</html>

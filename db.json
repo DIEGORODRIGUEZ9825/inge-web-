@@ -1,0 +1,85 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "nombre": "Admin DARM",
+      "email": "admin@autosdarm.com",
+      "rol": "Gerente",
+      "password": "admin123"
+    },
+    {
+      "id": "271c",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "3a1c",
+      "email": "incompleto@autosdarm.com"
+    },
+    {
+      "id": "f472",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "a52e",
+      "email": "incompleto@autosdarm.com"
+    },
+    {
+      "id": "f006",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "53c4",
+      "email": "incompleto@autosdarm.com"
+    },
+    {
+      "id": "7275",
+      "nombre": "diego rodriguez",
+      "email": "diego98@autosdarm.com",
+      "rol": "Gerente",
+      "password": "0000"
+    },
+    {
+      "id": "f6d9",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "47a0",
+      "email": "incompleto@autosdarm.com"
+    },
+    {
+      "id": "6e74",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "d7a0",
+      "email": "incompleto@autosdarm.com"
+    },
+    {
+      "id": "fff9",
+      "nombre": "EDUARDO LOZANO ",
+      "email": "erl@autosdarm.com",
+      "rol": "Asesor",
+      "password": "12345"
+    },
+    {
+      "id": "8bd2",
+      "nombre": "Test User",
+      "email": "jest@autosdarm.com",
+      "password": "12345"
+    },
+    {
+      "id": "ace9",
+      "email": "incompleto@autosdarm.com"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autos DARM • Registro de usuario</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; background: #f1f5f9; font-family: sans-serif;
+    }
+    .box {
+      background: white; padding: 2rem; border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 320px;
+    }
+    h1 { text-align:center; margin-bottom: 1rem; }
+    input, select, button {
+      width: 100%; padding: .75rem; margin-top: .5rem; border-radius: .5rem;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #16a34a; color:white; font-weight:bold; cursor:pointer;
+    }
+    button:hover { background:#15803d; }
+    .msg { text-align:center; margin-top:1rem; }
+    a { display:block; text-align:center; margin-top:1rem; color:#2563eb; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Registro Autos DARM</h1>
+    <form id="registerForm">
+      <label>Nombre</label>
+      <input id="nombre" required placeholder="Tu nombre completo" />
+      <label>Correo</label>
+      <input id="email" type="email" required placeholder="correo@empresa.com" />
+      <label>Rol</label>
+      <select id="rol">
+        <option>Asesor</option>
+        <option>Gerente</option>
+        <option>Empleado</option>
+      </select>
+      <label>Contraseña</label>
+      <input id="password" type="password" required placeholder="••••••••" />
+      <button type="submit">Registrar</button>
+      <p class="msg" id="registerMsg"></p>
+    </form>
+    <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+  </div>
+
+  <script>
+    // después
+    const API_URL = "http://localhost:3002/users";
+    const form = document.getElementById('registerForm');
+    const msg = document.getElementById('registerMsg');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const user = {
+        nombre: form.nombre.value,
+        email: form.email.value,
+        rol: form.rol.value,
+        password: form.password.value
+      };
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user)
+        });
+        if (!res.ok) throw new Error("No se pudo registrar el usuario");
+        msg.style.color = "#16a34a";
+        msg.textContent = "✅ Registro exitoso, redirigiendo...";
+        setTimeout(() => window.location.href = "login.html", 1500);
+      } catch (err) {
+        msg.style.color = "#ef4444";
+        msg.textContent = "❌ " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
